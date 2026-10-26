@@ -38,3 +38,7 @@ results/
 __pycache__/
 *.pyc
 scripts/*.png
+
+# Web dashboard dependencies and generated assets
+web/node_modules/
+web/dist/

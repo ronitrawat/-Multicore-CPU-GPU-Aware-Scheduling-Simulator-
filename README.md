@@ -143,6 +143,9 @@ Every policy implements the polymorphic `IScheduler` interface:
 │   └── srtf_demo.csv            # Preemption verification workload
 ├── scripts/
 │   └── plot_results.py          # Python matplotlib visualizer
+├── web/                         # Node.js API and React visualization dashboard
+│   ├── server.js                # Local API invoking the C++ simulator
+│   └── src/                     # React dashboard and charts
 ├── CMakeLists.txt               # CMake build configuration
 └── compile.bat                  # Direct MSYS2/MinGW build script
 ```
@@ -155,6 +158,7 @@ Every policy implements the polymorphic `IScheduler` interface:
 - **C++ Compiler**: Modern C++17 or C++20 compliant compiler (`g++` 9+, `clang++` 10+, or MSVC 2019+).
 - **CMake**: Version 3.14 or later.
 - **Python 3** (Optional, for plots): `matplotlib`, `pandas`.
+- **Node.js**: Version 18 or later and npm (for the web dashboard).
 
 ### Option 1: CMake (Cross-Platform)
 
@@ -188,6 +192,47 @@ ctest --output-on-failure
 ```
 
 All 41 unit tests across core algorithms, edge cases, multicore topologies, aging starvation avoidance, and MLFQ dynamics pass with 100% coverage.
+
+## Web Dashboard
+
+The local React dashboard runs the existing C++ simulator and visualizes its actual JSON and Gantt CSV exports. It includes configurable workloads and CPU topology, a comparison of all scheduling policies, latency charts, per-core timelines, and process-level metrics.
+
+### Dashboard preview
+
+![Scheduler dashboard overview](./web/demo/dashboard-overview.png)
+
+See the [policy comparison](./web/demo/policy-comparison.png), [multicore execution timeline](./web/demo/execution-timeline.png), and [process metrics](./web/demo/process-metrics.png), or [download the recorded WebM walkthrough](./web/demo/scheduler-dashboard.webm).
+
+### Start the dashboard in development
+
+Build the C++ simulator first if `build/scheduler.exe` (Windows) or `build/scheduler` (Linux/macOS) is not already present. Then, from the repository root:
+
+```bash
+cd web
+npm install
+npm run dev
+```
+
+Open the Vite URL printed in the terminal (normally `http://127.0.0.1:5173`). The Node API listens on `http://127.0.0.1:4174`.
+
+For a production-style local run, build the frontend and start the API server:
+
+```bash
+cd web
+npm run build
+npm start
+```
+
+Then open `http://127.0.0.1:4174`. To use a simulator binary at a different path, set `SCHEDULER_BINARY` before starting the server. The API binds to loopback by default.
+
+To regenerate the GitHub screenshots and WebM demo after starting the production server, install Playwright's recording tools and run the capture script from `web/`:
+
+```bash
+npx playwright install msedge ffmpeg
+npm run capture:demo
+```
+
+The script uses Microsoft Edge by default; set `PLAYWRIGHT_BROWSER_CHANNEL=chrome` to use Google Chrome instead.
 
 ---
 
